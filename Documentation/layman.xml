@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE repositories SYSTEM "/dtd/repositories.dtd">
+<repositories xmlns="" version="1.0">
+	<repo quality="experimental" status="unofficial">
+		<name><![CDATA[qtmax]]></name>
+		<description lang="en"><![CDATA[qtmax's overlay]]></description>
+		<homepage>https://github.com/gentoo-root/qtmax-overlay</homepage>
+		<owner type="person">
+			<email>maxtram95@gmail.com</email>
+			<name><![CDATA[Maxim Mikityanskiy]]></name>
+		</owner>
+		<source type="git">git://github.com/gentoo-root/qtmax-overlay.git</source>
+		<feed>https://github.com/gentoo-root/qtmax-overlay/commits/master.atom</feed>
+	</repo>
+</repositories>
