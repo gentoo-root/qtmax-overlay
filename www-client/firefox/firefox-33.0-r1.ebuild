@@ -26,7 +26,7 @@ fi
 
 # Patch version
 PATCH="${PN}-31.0-patches-0.2"
-KDE_PATCH_REV="4944f392c4d8"
+KDE_PATCH_REV="56f82b5e7ce7"
 # Upstream ftp release URI that's used by mozlinguas.eclass
 # We don't use the http mirror because it deletes old tarballs.
 MOZ_FTP_URI="ftp://ftp.mozilla.org/pub/${PN}/releases/"
