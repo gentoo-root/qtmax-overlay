@@ -1,0 +1,11 @@
+/var/lib/litecoin/.litecoin/debug.log {
+	weekly
+	sharedscripts
+	postrotate
+		if [ $(systemctl is-system-running) != unknown ]; then
+			systemctl reload litecoin.service
+		else
+			kill -HUP $(cat /var/run/litecoind.pid)
+		fi
+	endscript
+}
