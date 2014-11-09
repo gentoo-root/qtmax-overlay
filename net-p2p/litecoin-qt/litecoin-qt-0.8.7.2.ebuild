@@ -20,7 +20,8 @@ SRC_URI="https://github.com/${MyPN}-project/${MyPN}/archive/v${MyPV}.tar.gz -> $
 LICENSE="MIT ISC GPL-3 LGPL-2.1 public-domain || ( CC-BY-SA-3.0 LGPL-2.1 )"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-IUSE="dbus ipv6 kde +qrcode upnp"
+IUSE="dbus ipv6 +qrcode upnp"
+#IUSE="dbus ipv6 kde +qrcode upnp"
 
 RDEPEND="
 	dev-libs/boost[threads(+)]
@@ -113,12 +114,12 @@ src_install() {
 
 	make_desktop_entry "${PN} %u" "Litecoin-Qt" "/usr/share/pixmaps/${PN}.ico" "Qt;Network;P2P;Office;Finance;" "MimeType=x-scheme-handler/litecoin;\nTerminal=false"
 
-	newman contrib/debian/manpages/bitcoin-qt.1 ${PN}.1
+#	newman contrib/debian/manpages/bitcoin-qt.1 ${PN}.1
 
-	if use kde; then
-		insinto /usr/share/kde4/services
-		newins contrib/debian/bitcoin-qt.protocol ${PN}.protocol
-	fi
+#	if use kde; then
+#		insinto /usr/share/kde4/services
+#		newins contrib/debian/bitcoin-qt.protocol ${PN}.protocol
+#	fi
 }
 
 update_caches() {
