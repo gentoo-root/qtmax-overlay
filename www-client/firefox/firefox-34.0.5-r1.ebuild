@@ -313,7 +313,7 @@ src_install() {
 		|| die
 	if use kde; then
 		cat "${FILESDIR}"/kde.js >> \
-			"${S}/${obj_dir}/dist/bin/browser/defaults/preferences/all-gentoo.js" \
+			"${BUILD_OBJ_DIR}/dist/bin/browser/defaults/preferences/all-gentoo.js" \
 			|| die
 	fi
 
