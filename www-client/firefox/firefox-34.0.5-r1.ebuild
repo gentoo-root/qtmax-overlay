@@ -298,6 +298,12 @@ src_install() {
 	# Pax mark xpcshell for hardened support, only used for startupcache creation.
 	pax-mark m "${BUILD_OBJ_DIR}"/dist/bin/xpcshell
 
+	if use kde; then
+		cp "${FILESDIR}"/kde.js \
+			"${BUILD_OBJ_DIR}/dist/bin/defaults/pref/kde.js" \
+			|| die
+	fi
+
 	# Add our default prefs for firefox
 	cp "${FILESDIR}"/gentoo-default-prefs.js-1 \
 		"${BUILD_OBJ_DIR}/dist/bin/browser/defaults/preferences/all-gentoo.js" \
@@ -311,11 +317,6 @@ src_install() {
 	echo "pref(\"extensions.autoDisableScopes\", 3);" >> \
 		"${BUILD_OBJ_DIR}/dist/bin/browser/defaults/preferences/all-gentoo.js" \
 		|| die
-	if use kde; then
-		cat "${FILESDIR}"/kde.js >> \
-			"${BUILD_OBJ_DIR}/dist/bin/browser/defaults/preferences/all-gentoo.js" \
-			|| die
-	fi
 
 	local plugin
 	use gmp-autoupdate || for plugin in \
@@ -385,6 +386,11 @@ src_install() {
 	insinto /etc/revdep-rebuild
 	echo "SEARCH_DIRS_MASK=${MOZILLA_FIVE_HOME}" >> ${T}/10firefox
 	doins "${T}"/10${PN} || die
+
+	if use kde; then
+		insinto "${MOZILLA_FIVE_HOME}/browser/defaults/preferences"
+		doins "${FILESDIR}"/kde.js
+	fi
 }
 
 pkg_preinst() {
