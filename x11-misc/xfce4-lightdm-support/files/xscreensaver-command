@@ -1,0 +1,6 @@
+#!/bin/sh
+if [ "$1" == "-lock" ]; then
+	exec dm-tool lock
+else
+	exit 1
+fi
