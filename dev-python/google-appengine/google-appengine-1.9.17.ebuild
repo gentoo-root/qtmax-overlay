@@ -23,20 +23,8 @@ sr_Latn sv sw ta te th tr tt uk ur vi zh_CN zh_TW"
 
 IUSE="examples $(printf 'linguas_%s ' ${IUSE_LINGUAS})"
 
-RDEPEND="
-	dev-python/mysql-python
-	dev-python/lxml
-	virtual/python-imaging
-	dev-python/numpy
-	dev-python/pycrypto
-	dev-python/django
-	dev-python/jinja
-	dev-python/markupsafe
-	dev-python/pyopenssl
-	dev-python/pyyaml
-	dev-python/webob
-	media-libs/libpng:1.2
-"
+RDEPEND="${PYTHON_DEPS}"
+DEPEND="${PYTHON_DEPS}"
 
 S="${WORKDIR}/${PN/-/_}"
 
