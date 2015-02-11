@@ -4,7 +4,9 @@
 
 EAPI=5
 
-inherit python
+PYTHON_COMPAT=( python2_7 )
+
+inherit python-single-r1
 
 DESCRIPTION="Google App Engine SDK for Python"
 HOMEPAGE="http://appengine.google.com/"
@@ -36,17 +38,10 @@ RDEPEND="
 	media-libs/libpng:1.2
 "
 
-PYTHON_DEPEND="2"
-
 S="${WORKDIR}/${PN/-/_}"
 
-src_prepare(){
- 	sed -i -e "s#^DIR_PATH = .*\$#DIR_PATH = '/opt/${PN}'#" \
- 		-e 's#/usr/bin/env python#/usr/bin/python2#' *.py \
- 		|| die "sed failed"
-	
-	find -name "*.jpg" -exec rm -f {} \;
-	find -name "*.png" -exec rm -f {} \;
+src_prepare() {
+	python_fix_shebang *.py
 
 	einfo "Removing unnecessary translations..."
 	# remove loooots of unnecessary translations
@@ -57,16 +52,18 @@ src_prepare(){
 	done
 }
 
-src_install(){
+src_install() {
+	python_domodule google
+
 	insinto /opt/${PN}
-	doins -r google lib tools VERSION || die "install failed"
+	doins -r lib tools VERSION || die "install failed"
 
 	if use examples ; then
 		insinto /opt/${PN}/examples
 		doins -r demos new_project_template || die "install examples failed"
 	fi
 
-	exeinto /opt/${PN}/bin
+	exeinto /opt/${PN}
 	doexe *.py
 	dodoc BUGS README RELEASE_NOTES
 }
