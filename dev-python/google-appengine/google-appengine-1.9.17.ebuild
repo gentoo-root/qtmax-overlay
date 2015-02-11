@@ -53,6 +53,7 @@ src_prepare() {
 }
 
 src_install() {
+	python_moduleinto /opt/${PN}
 	python_domodule google
 
 	insinto /opt/${PN}
