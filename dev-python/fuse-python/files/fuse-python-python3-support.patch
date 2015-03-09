@@ -1,7 +1,26 @@
-diff -ur a/fuseparts/_fusemodule.c b/fuseparts/_fusemodule.c
+diff -upr a/fuseparts/_fusemodule.c b/fuseparts/_fusemodule.c
 --- a/fuseparts/_fusemodule.c
 +++ b/fuseparts/_fusemodule.c
-@@ -87,8 +87,8 @@
+@@ -54,16 +54,14 @@ static PyInterpreterState *interp;
+ #define PYLOCK()						\
+ PyThreadState *_state = NULL;					\
+ if (interp) {							\
+-	PyEval_AcquireLock();					\
+ 	_state = PyThreadState_New(interp);			\
+-	PyThreadState_Swap(_state);				\
++	PyEval_AcquireThread(_state);				\
+ }
+ 
+ #define PYUNLOCK() if (interp) {				\
+ 	PyThreadState_Clear(_state);				\
+-	PyThreadState_Swap(NULL);				\
++	PyEval_ReleaseThread(_state);				\
+ 	PyThreadState_Delete(_state);				\
+-	PyEval_ReleaseLock();					\
+ }
+  
+ #else
+@@ -87,8 +85,8 @@ if (v == Py_None) {		\
  	ret = 0;		\
  	goto OUT_DECREF;	\
  }				\
@@ -12,12 +31,12 @@ diff -ur a/fuseparts/_fusemodule.c b/fuseparts/_fusemodule.c
  	goto OUT_DECREF;	\
  }
  
-@@ -119,14 +119,14 @@
+@@ -119,18 +117,15 @@ fi_to_py(struct fuse_file_info *fi)
  /* transform a Python integer to an unsigned C numeric value */
  
  #define py2attr(st, attr) {						\
 -	if (PyInt_Check(pytmp) && sizeof((st)->attr) <= sizeof(long)) {	\
-+	if (PyLong_Check(pytmp) && sizeof((st)->attr) <= sizeof(long)) {	\
++	if (PyLong_Check(pytmp) && sizeof((st)->attr) <= sizeof(long)) {\
  		/*							\
  		 * We'd rather use here PyInt_AsUnsignedLong() here	\
  		 * but there is no such thing. Closest match is		\
@@ -25,11 +44,16 @@ diff -ur a/fuseparts/_fusemodule.c b/fuseparts/_fusemodule.c
  		 * for overflows. Duh.					\
  		 */							\
 -		ctmp = PyInt_AsLong(pytmp);				\
+-		if (ctmp >						\
+-		    /* damn the funcall overhead...			\
+-		           PyInt_GetMax() */				\
+-		           LONG_MAX) {					\
 +		ctmp = PyLong_AsLong(pytmp);				\
- 		if (ctmp >						\
- 		    /* damn the funcall overhead...			\
- 		           PyInt_GetMax() */				\
-@@ -140,13 +140,13 @@
++		if (ctmp > LONG_MAX) {					\
+ 			/*						\
+ 			 * If the value, as unsigned, is bigger than	\
+ 			 * Python ints can be, then it was a negative	\
+@@ -140,15 +135,13 @@ fi_to_py(struct fuse_file_info *fi)
  			goto OUT_DECREF;				\
  		}							\
  	} else {							\
@@ -42,48 +66,50 @@ diff -ur a/fuseparts/_fusemodule.c b/fuseparts/_fusemodule.c
 +			 * PyLong_Check() ...				\
  			 */						\
 -			ctmp = PyInt_AsUnsignedLongLongMask(pytmp);	\
+-		else if (PyLong_Check(pytmp))				\
+-			ctmp = PyLong_AsUnsignedLongLong(pytmp);	\
 +			ctmp = PyLong_AsUnsignedLongLongMask(pytmp);	\
- 		else if (PyLong_Check(pytmp))				\
- 			ctmp = PyLong_AsUnsignedLongLong(pytmp);	\
  		else if (PyFloat_Check(pytmp))				\
-@@ -261,11 +261,11 @@
+ 			ctmp =						\
+ 			  (unsigned long long)PyFloat_AsDouble(pytmp);	\
+@@ -261,11 +254,11 @@ readlink_func(const char *path, char *li
  
  	PROLOGUE( PyObject_CallFunction(readlink_cb, "s", path) )
  
 -	if(!PyString_Check(v)) {
-+	if(!PyBytes_Check(v)) {
++	if(!PyUnicode_Check(v)) {
  		ret = -EINVAL;
  		goto OUT_DECREF;
  	}
 -	s = PyString_AsString(v);
-+	s = PyBytes_AsString(v);
++	s = PyUnicode_AsUTF8(v);
  	strncpy(link, s, size);
  	link[size-1] = '\0';
  	ret = 0;
-@@ -327,18 +327,18 @@
+@@ -326,18 +319,18 @@ dir_add_entry(PyObject *v, fuse_dirh_t b
  
  	if (!(pytmp = PyObject_GetAttrString(v, "name"))) 
  		goto OUT_DECREF;		       
 -	if (!PyString_Check(pytmp)) {
-+	if (!PyBytes_Check(pytmp)) {
++	if (!PyUnicode_Check(pytmp)) {
  		Py_DECREF(pytmp);
  		goto OUT_DECREF;		       
  	}					       
  
  #if FUSE_VERSION >= 23
 -	ret = df(buf, PyString_AsString(pytmp), &st, offs.offset);
-+	ret = df(buf, PyBytes_AsString(pytmp), &st, offs.offset);
++	ret = df(buf, PyUnicode_AsUTF8(pytmp), &st, offs.offset);
  #elif FUSE_VERSION >= 21
 -	ret = df(buf, PyString_AsString(pytmp), (st.st_mode & 0170000) >> 12,
-+	ret = df(buf, PyBytes_AsString(pytmp), (st.st_mode & 0170000) >> 12,
++	ret = df(buf, PyUnicode_AsUTF8(pytmp), (st.st_mode & 0170000) >> 12,
                   st.st_ino);
  #else
 -	ret = df(buf, PyString_AsString(pytmp), (st.st_mode & 0170000) >> 12);
-+	ret = df(buf, PyBytes_AsString(pytmp), (st.st_mode & 0170000) >> 12);
++	ret = df(buf, PyUnicode_AsUTF8(pytmp), (st.st_mode & 0170000) >> 12);
  #endif
  	Py_DECREF(pytmp);
  
-@@ -491,11 +491,11 @@
+@@ -490,11 +483,11 @@ read_func(const char *path, char *buf, s
  	PROLOGUE( PYO_CALLWITHFI(fi, read_cb, snK, path, s, off) )
  #endif
  
@@ -99,7 +125,7 @@ diff -ur a/fuseparts/_fusemodule.c b/fuseparts/_fusemodule.c
  	}
  
  	EPILOGUE
-@@ -686,25 +686,25 @@
+@@ -677,25 +670,25 @@ getxattr_func(const char *path, const ch
  	PROLOGUE( PyObject_CallFunction(getxattr_cb, "ssn", path, name, size) )
  #endif
  
@@ -130,7 +156,7 @@ diff -ur a/fuseparts/_fusemodule.c b/fuseparts/_fusemodule.c
  	}
  
  	EPILOGUE
-@@ -735,18 +735,18 @@
+@@ -726,18 +719,18 @@ listxattr_func(const char *path, char *l
  			break;
  		}
  
@@ -152,12 +178,12 @@ diff -ur a/fuseparts/_fusemodule.c b/fuseparts/_fusemodule.c
  		lx += ilen + 1;
  
  		Py_DECREF(w);
-@@ -1054,14 +1054,14 @@
+@@ -1045,14 +1038,14 @@ Fuse_main(PyObject *self, PyObject *args
  			PyObject *pa;
  	
  			pa = PySequence_GetItem(fargseq, i);
 -			if (!PyString_Check(pa)) {
-+			if (!PyBytes_Check(pa)) {
++			if (!PyUnicode_Check(pa)) {
  				Py_DECREF(pa);
  
  				PyErr_SetString(PyExc_TypeError,
@@ -165,23 +191,23 @@ diff -ur a/fuseparts/_fusemodule.c b/fuseparts/_fusemodule.c
  		                return(NULL);
  			}
 -			fargv[i] =  PyString_AsString(pa);
-+			fargv[i] =  PyBytes_AsString(pa);
++			fargv[i] =  PyUnicode_AsUTF8(pa);
  
  			Py_DECREF(pa);
  		}
-@@ -1138,17 +1138,17 @@
+@@ -1129,17 +1122,17 @@ FuseInvalidate(PyObject *self, PyObject
  	if (!(arg1 = PyTuple_GetItem(args, 1)))
  		return(NULL);
  
 -	if(!PyString_Check(arg1)) {
-+	if(!PyBytes_Check(arg1)) {
++	if(!PyUnicode_Check(arg1)) {
  		PyErr_SetString(PyExc_TypeError, "argument must be a string");
  
  		return(NULL);
  	}
  
 -	path = PyString_AsString(arg1);
-+	path = PyBytes_AsString(arg1);
++	path = PyUnicode_AsUTF8(arg1);
  
  	err = fuse_invalidate(fuse, path);
  
@@ -190,7 +216,7 @@ diff -ur a/fuseparts/_fusemodule.c b/fuseparts/_fusemodule.c
  
  	return(ret);
  }
-@@ -1169,15 +1169,15 @@
+@@ -1160,15 +1153,15 @@ FuseGetContext(PyObject *self, PyObject
  	if(!ret)
  		return(NULL);
  
@@ -209,7 +235,7 @@ diff -ur a/fuseparts/_fusemodule.c b/fuseparts/_fusemodule.c
  	PyDict_SetItemString(ret, "pid", num);	
  	Py_XDECREF( num );
  
-@@ -1190,7 +1190,7 @@
+@@ -1181,7 +1174,7 @@ static char FuseAPIVersion__doc__[] =
  static PyObject *
  FuseAPIVersion(PyObject *self, PyObject *args)
  {
@@ -218,7 +244,7 @@ diff -ur a/fuseparts/_fusemodule.c b/fuseparts/_fusemodule.c
  
  	return favers;
  }
-@@ -1206,13 +1206,25 @@
+@@ -1197,13 +1190,25 @@ static PyMethodDef Fuse_methods[] = {
  
  /* Initialization function for the module (*must* be called init_fuse) */
  
@@ -247,22 +273,21 @@ diff -ur a/fuseparts/_fusemodule.c b/fuseparts/_fusemodule.c
  
  	/* Add some symbolic constants to the module */
  	d = PyModule_GetDict(m);
-@@ -1220,4 +1232,6 @@
+@@ -1211,4 +1216,6 @@ init_fuse(void)
  	PyDict_SetItemString(d, "FuseError", Py_FuseError);
  	/* compat */
  	PyDict_SetItemString(d, "error", Py_FuseError);
 +
 +	return m;
  }
-diff -ur a/fuse.py b/fuse.py
+diff -upr a/fuse.py b/fuse.py
 --- a/fuse.py
 +++ b/fuse.py
-@@ -17,15 +17,15 @@
+@@ -17,15 +17,14 @@ try:
  except:
      pass
  
 -from string import join
-+#rom string import join
  import sys
  import os
  from errno import *
