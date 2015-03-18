@@ -26,7 +26,14 @@ RDEPEND="
 	net-libs/libsoup:2.4
 	x11-libs/gdk-pixbuf:2
 "
-DEPEND="${RDEPEND}"
+DEPEND="
+	test? ( app-arch/unzip )
+	${RDEPEND}"
+
+src_unpack() {
+	unpack ${A}
+	bzr_src_unpack
+}
 
 src_prepare() {
 	if ! use test; then
