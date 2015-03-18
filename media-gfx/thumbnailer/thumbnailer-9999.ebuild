@@ -43,7 +43,7 @@ src_prepare() {
 
 src_configure() {
 	local mycmakeargs=(
-		-DGTEST_SRC_DIR="${WORKDIR}/gtest-1.7.0/src"
+		-DGTEST_ROOT="${WORKDIR}/gtest-1.7.0"
 	)
 
 	cmake-utils_src_configure
