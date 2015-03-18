@@ -21,7 +21,7 @@ RDEPEND="
 	dev-qt/qtdbus:5
 	dev-qt/qtdeclarative:5
 	dev-qt/qtgraphicaleffects:5
-	dev-qt/qtmultimedia:5
+	dev-qt/qtmultimedia:5[qml]
 	dev-qt/qtquick1:5
 	dev-qt/qtquickcontrols:5
 	dev-qt/qtwidgets:5
