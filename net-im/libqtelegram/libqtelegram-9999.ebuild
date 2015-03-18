@@ -31,7 +31,7 @@ src_prepare() {
 	sed -i -e '/^    asserter.h$/d' lib/core/CMakeLists.txt
 
 	if use test; then
-		echo 'add_dependencies(${LIBQTELEGRAM_TESTS_TARGET} ${GTEST_LIBRARY)' >> tests/CMakeLists.txt
+		echo 'add_dependencies(${LIBQTELEGRAM_TESTS_TARGET} ${GTEST_LIBRARY})' >> tests/CMakeLists.txt
 	else
 		sed -i -e '/^add_subdirectory(tests)$/d' CMakeLists.txt || die
 	fi
