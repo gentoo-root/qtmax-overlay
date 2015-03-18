@@ -31,7 +31,9 @@ DEPEND="
 	${RDEPEND}"
 
 src_unpack() {
-	unpack ${A}
+	if [ "${A}" != "" ]; then
+		unpack ${A}
+	fi
 	bzr_src_unpack
 }
 
