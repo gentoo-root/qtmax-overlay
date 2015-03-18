@@ -26,3 +26,8 @@ RDEPEND="
 	media-libs/libmediainfo
 "
 DEPEND="${RDEPEND}"
+
+src_prepare() {
+	# asserter.h is removed
+	sed -i -e '/^    asserter.h$/d' lib/core/CMakeLists.txt
+}
