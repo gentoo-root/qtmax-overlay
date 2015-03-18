@@ -13,10 +13,9 @@ EBZR_REPO_URI="lp:libqtelegram"
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-IUSE=""
+IUSE="test"
 
 RDEPEND="
-	dev-cpp/gtest
 	dev-db/sqlite:3
 	dev-libs/openssl
 	dev-qt/qtcore:5
@@ -30,4 +29,10 @@ DEPEND="${RDEPEND}"
 src_prepare() {
 	# asserter.h is removed
 	sed -i -e '/^    asserter.h$/d' lib/core/CMakeLists.txt
+
+	if use test; then
+		echo 'add_dependencies(${LIBQTELEGRAM_TESTS_TARGET} ${GTEST_LIBRARY_PATH})' >> tests/CMakeLists.txt
+	else
+		sed -i -e '/^add_subdirectory(tests)$/d' CMakeLists.txt || die
+	fi
 }
