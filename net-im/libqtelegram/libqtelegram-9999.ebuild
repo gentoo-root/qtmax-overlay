@@ -40,7 +40,7 @@ src_prepare() {
 
 src_configure() {
 	local mycmakeargs=(
-		-DCMAKE_INSTALL_LIBDIR="${EPREFIX}"/usr/$(get_libdir)
+		-DCMAKE_INSTALL_LIBDIR=$(get_libdir)
 	)
 
 	cmake-utils_src_configure
