@@ -27,8 +27,8 @@ RDEPEND="
 DEPEND="${RDEPEND}"
 
 src_prepare() {
-	# asserter.h and constants.h is removed
-	sed -i -r -e '/^    (asserter|constants).h$/d' lib/core/CMakeLists.txt
+	# some header files were moved to lib/util
+	sed -i -r -e '/^    (asserter|constants|cryptoutils|tlvalues|utils).h$/d' lib/core/CMakeLists.txt
 
 	if use test; then
 		echo 'add_dependencies(${LIBQTELEGRAM_TESTS_TARGET} ${GTEST_LIBRARY})' >> tests/CMakeLists.txt
