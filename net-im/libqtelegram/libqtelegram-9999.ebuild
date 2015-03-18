@@ -40,7 +40,7 @@ src_prepare() {
 
 src_configure() {
 	local mycmakeargs=(
-		-DCMAKE_INSTALL_LIBDIR=$(get_libdir)
+		-DQT_IMPORTS_DIR=$(get_libdir)/qt5/qml
 	)
 
 	cmake-utils_src_configure
