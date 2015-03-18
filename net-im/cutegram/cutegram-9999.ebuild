@@ -4,7 +4,7 @@
 
 EAPI=5
 
-inherit git-r3 qmake-utils
+inherit fdo-mime git-r3 gnome2-utils qmake-utils
 
 DESCRIPTION="Telegram client by Aseman Land"
 HOMEPAGE="http://aseman.co/cutegram"
@@ -36,4 +36,18 @@ src_configure() {
 
 src_install() {
 	emake INSTALL_ROOT="${D}" install
+}
+
+pkg_preinst() {
+	gnome2_icon_savelist
+}
+
+pkg_postinst() {
+	fdo-mime_desktop_database_update
+	gnome2_icon_cache_update
+}
+
+pkg_postrm() {
+	fdo-mime_desktop_database_update
+	gnome2_icon_cache_update
 }
