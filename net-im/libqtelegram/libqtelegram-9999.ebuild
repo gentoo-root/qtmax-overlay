@@ -37,3 +37,11 @@ src_prepare() {
 		sed -i -e '/^add_subdirectory(tests)$/d' CMakeLists.txt || die
 	fi
 }
+
+src_configure() {
+	local mycmakeargs=(
+		-DCMAKE_INSTALL_LIBDIR="${EPREFIX}"/usr/$(get_libdir)
+	)
+
+	cmake-utils_src_configure
+}
