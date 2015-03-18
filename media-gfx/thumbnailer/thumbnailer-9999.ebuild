@@ -9,11 +9,12 @@ inherit bzr cmake-utils
 DESCRIPTION="A simple shared library that produces and stores thumbnails"
 HOMEPAGE="https://launchpad.net/thumbnailer"
 EBZR_REPO_URI="lp:thumbnailer"
+SRC_URI="test? ( http://googletest.googlecode.com/files/gtest-1.7.0.zip )"
 
 LICENSE="LGPL-3"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-IUSE=""
+IUSE="test"
 
 RDEPEND="
 	dev-libs/glib:2
@@ -26,3 +27,17 @@ RDEPEND="
 	x11-libs/gdk-pixbuf:2
 "
 DEPEND="${RDEPEND}"
+
+src_prepare() {
+	if ! use test; then
+		sed -i -e '/^add_subdirectory(tests)$/d' CMakeLists.txt || die
+	fi
+}
+
+src_configure() {
+	local mycmakeargs=(
+		-DGTEST_SRC_DIR="${WORKDIR}/gtest-1.7.0"
+	)
+
+	cmake-utils_src_configure
+}
