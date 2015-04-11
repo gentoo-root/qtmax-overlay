@@ -33,8 +33,7 @@ src_compile() {
 src_install() {
 	linux-mod_src_install
 	dosbin utils/v4l2loopback-ctl
-	dodoc doc/kernel_debugging.txt
-	dohtml doc/v4l2.html
+	dodoc doc/*
 	if use examples; then
 		dosbin examples/yuv4mpeg_to_v4l2
 		docinto examples
