@@ -1,0 +1,38 @@
+--- a/lib/perl/CXMenuXDG.pm	2015-04-27 22:24:27.642349025 +0300
++++ b/lib/perl/CXMenuXDG.pm	2015-04-27 22:27:28.775801263 +0300
+@@ -135,7 +135,7 @@
+     }
+ 
+     # Update or create the .directory file
+-    my $folder_dir="$self->{xdg_dir}/desktop-directories";
++    my $folder_dir="$self->{destdir}/$self->{xdg_dir}/desktop-directories";
+     my $filename="$folder_dir/$basename.directory";
+     if ($new_folder or !$component->{intermediate} or !-f $filename)
+     {
+@@ -483,7 +483,7 @@
+             }
+             $component->{_creator}="";
+             last if (!$component->{is_dir});
+-            CXMenu::xdg_install_icons($self->{xdg_dir}, $self->{tag}, $component);
++            CXMenu::xdg_install_icons("$self->{destdir}/$self->{xdg_dir}", $self->{tag}, $component);
+             $folder=$self->create_folder($folder, $component);
+             return 0 if (!defined $folder);
+         }
+@@ -497,7 +497,7 @@
+         $menu->{_creator}="";
+     }
+ 
+-    CXMenu::xdg_install_icons($self->{xdg_dir}, $self->{tag}, $menu);
++    CXMenu::xdg_install_icons("$self->{destdir}/$self->{xdg_dir}", $self->{tag}, $menu);
+     if ($menu->{is_dir})
+     {
+         # Make sure our brand new (maybe empty) folder will not be
+@@ -510,7 +510,7 @@
+         $self->{status}->{$xdir}="in-use";
+ 
+         # Create the desktop file
+-        my $apps_dir="$self->{xdg_dir}/applications";
++        my $apps_dir="$self->{destdir}/$self->{xdg_dir}/applications";
+         if (!cxmkpath($apps_dir))
+         {
+             cxerr("unable to create the '$apps_dir' directory: $@\n");
