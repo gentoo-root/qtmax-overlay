@@ -9,10 +9,9 @@
 		optimizations (-Os, -O0, -O1, -O2, -O3)</flag>
 	<flag name="gmp-autoupdate">Allow Gecko Media Plugins (binary blobs) to be automatically
 		downloaded and kept up-to-date in user profiles</flag>
-	<flag name="ipc">Use inter-process communication between tabs and plugins.
-		Allows for greater stability in case of plugin crashes</flag>
+	<flag name="jemalloc3">Enable or disable jemalloc3 (forced-on when supported prior to 38.0)</flag>
 	<flag name="kde">Add KDE integration.</flag>
-	<flag name="minimal"> Prevent sdk and headers from being installed</flag>
+	<flag name="minimal">Prevent sdk and headers from being installed</flag>
 	<flag name="oldbranding">Use old non-plain branding.</flag>
 	<flag name="pgo">Add support for profile-guided optimization using gcc-4.5,
 		for faster binaries. This option will double the compile time.</flag>
@@ -26,6 +25,5 @@
 		instead of bundled.</flag>
 	<flag name="system-sqlite">Use the system-wide <pkg>dev-db/sqlite</pkg>
 		installation with secure-delete enabled</flag>
-	<flag name="webm">Support HTML5 WebM with <pkg>media-libs/libvpx</pkg> on firefox-10.</flag>
 </use>
 </pkgmetadata>
